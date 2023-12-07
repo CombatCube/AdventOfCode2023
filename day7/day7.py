@@ -5,16 +5,16 @@ RANK_ORDER = {
     "A": 1,
     "K": 2,
     "Q": 3,
-    "J": 4,
-    "T": 5,
-    "9": 6,
-    "8": 7,
-    "7": 8,
-    "6": 9,
-    "5": 10,
-    "4": 11,
-    "3": 12,
-    "2": 13
+    "T": 4,
+    "9": 5,
+    "8": 6,
+    "7": 7,
+    "6": 8,
+    "5": 9,
+    "4": 10,
+    "3": 11,
+    "2": 12,
+    "J": 13
 }
 
 HAND_ORDER = {
@@ -37,20 +37,40 @@ def hand_type(cards):
             card_count[card] += 1
     keys = card_count.keys()
     values = card_count.values()
-    if 5 in values:
+    jokers = card_count["J"] if card_count.get("J") is not None else 0
+    if 5 in values:                     # AAAAA
         return "FIVE_OF_A_KIND"
-    elif 4 in values:
-        return "FOUR_OF_A_KIND"
-    elif 3 in values:
-        if 2 in values:
+    elif 4 in values:                   # AAAAB
+        if jokers == 1:                 # AAAAJ
+            return "FIVE_OF_A_KIND"
+        if jokers == 4:                 # AJJJJ
+            return "FIVE_OF_A_KIND"
+        return "FOUR_OF_A_KIND"         # AAAAB
+    elif 3 in values:                   # AAABC
+        if jokers == 3:                 # ABJJJ
+            return "FOUR_OF_A_KIND"
+        if jokers == 2:                 # AAAJJ
+            return "FIVE_OF_A_KIND"
+        if jokers == 1:                 # AAABJ
+            return "FOUR_OF_A_KIND"
+        if 2 in values:                 # AAABB
             return "FULL_HOUSE"
-        else:
+        return "THREE_OF_A_KIND"        # AAABC
+    elif len(keys) == 3:                # AABBC
+        if jokers == 2:                 # AAJJB
+            return "FOUR_OF_A_KIND"
+        if jokers == 1:                 # AABBJ
+            return "FULL_HOUSE"
+        return "TWO_PAIR"               # AABBC
+    elif len(keys) == 4:                # AABCD
+        if jokers == 2:                 # ABCJJ
             return "THREE_OF_A_KIND"
-    if len(keys) == 3:
-        return "TWO_PAIR"
-    elif len(keys) == 4:
-        return "ONE_PAIR"
-    return "HIGH_CARD"
+        if jokers == 1:                 # AABCJ
+            return "THREE_OF_A_KIND"
+        return "ONE_PAIR"               # AABCD
+    elif jokers == 1:
+        return "ONE_PAIR"               # ABCDJ
+    return "HIGH_CARD"                  # ABCDE
 
 
 class Hand:
